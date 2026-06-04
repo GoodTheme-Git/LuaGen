@@ -1,0 +1,15 @@
+{
+  "name": "Level 0",
+  "description": "You have no-clipped out of reality. Good luck.",
+  "generator": "backrooms",
+  "skyColor": "#b0a050",
+  "fogColor": "#b0a050",
+  "fogNear": 20,
+  "fogFar": 60,
+  "gravity": -20,
+  "spawnPoint": { "x": 0, "y": 2, "z": 0 },
+  "objects": [],
+  "lights": [
+    { "type": "ambient", "color": "#fff5cc", "intensity": 0.2 }
+  ]
+}

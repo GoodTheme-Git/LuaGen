@@ -1,0 +1,21 @@
+{
+  "name": "luagen",
+  "version": "0.1.0",
+  "description": "LuaGen - Decentralized 3D WebWorlds. Host your own. Visit any URL.",
+  "main": "server/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "convert": "node tools/convert/gltf-to-world.js"
+  },
+  "keywords": ["luagen", "webworld", "3d", "lua", "multiplayer"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.2.1",
+    "fengari-web": "^0.1.4",
+    "three": "^0.184.0",
+    "ws": "^8.21.0"
+  }
+}
