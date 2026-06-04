@@ -56,6 +56,7 @@ const commands = {
     console.log(LOGO);
     const row = (cmd, desc) => console.log(`  ${c.cyan(cmd.padEnd(28))} ${c.dim(desc)}`);
     console.log(c.bold('Usage:') + '  luagen <command> [options]\n');
+    row('all',                 'Show everything: status, worlds, players');
     row('start',               'Start the server (foreground)');
     row('start --daemon',      'Start the server in the background');
     row('stop',                'Stop the background server');
@@ -227,6 +228,47 @@ const commands = {
     console.log();
     console.log(c.dim('  Restart the server to load the new world.'));
     console.log();
+  },
+
+  async all() {
+    console.log(LOGO);
+    try {
+      const [status, worlds] = await Promise.all([api('/api/status'), api('/api/worlds')]);
+      const worldMap = Object.fromEntries(worlds.map(w => [w.id, w]));
+
+      // Server line
+      console.log(`  ${c.green('●')} Running on port ${c.cyan(status.port)}  ·  uptime ${c.yellow(formatUptime(status.uptime))}  ·  ${c.cyan(status.totalPlayers)} player(s)\n`);
+
+      // Worlds + inline players
+      console.log(c.bold('  Worlds:'));
+      const loaded = new Set(status.worlds.map(w => w.id));
+      for (const w of worlds) {
+        const live = status.worlds.find(lw => lw.id === w.id);
+        const dot  = live?.players > 0 ? c.green('●') : loaded.has(w.id) ? c.dim('○') : c.dim('·');
+        const pStr = live?.players > 0 ? c.cyan(` ${live.players} player(s)`) : '';
+        console.log(`    ${dot} ${c.cyan(w.id.padEnd(16))} ${w.name}${pStr}`);
+        if (live?.players > 0) {
+          for (const p of live.playerList) {
+            console.log(`         ${c.dim('└')} ${p.name} ${c.dim(p.id)}`);
+          }
+        }
+      }
+      console.log();
+    } catch {
+      // Server offline — show worlds from disk only
+      console.log(`  ${c.red('●')} Server not running on port ${PORT}\n`);
+      const dir = path.join(ROOT, 'worlds');
+      const list = fs.readdirSync(dir)
+        .filter(d => fs.existsSync(path.join(dir, d, 'world.json')))
+        .map(d => JSON.parse(fs.readFileSync(path.join(dir, d, 'world.json'))) && { id: d, ...JSON.parse(fs.readFileSync(path.join(dir, d, 'world.json'))) });
+      console.log(c.bold('  Worlds') + c.dim(' (offline):'));
+      for (const w of list) {
+        console.log(`    ${c.dim('·')} ${c.cyan(w.id.padEnd(16))} ${w.name}`);
+      }
+      console.log();
+      console.log(`  ${c.dim('luagen start  to bring the server up')}`);
+      console.log();
+    }
   },
 
   convert() {
