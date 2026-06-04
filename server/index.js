@@ -41,6 +41,26 @@ app.get('/api/world/:id/script', (req, res) => {
   res.type('text/plain').send(fs.readFileSync(scriptPath, 'utf8'));
 });
 
+// Status endpoint — used by luagen CLI
+const _startTime = Date.now();
+app.get('/api/status', (req, res) => {
+  const worldList = Object.entries(worlds).map(([id, w]) => {
+    const meta = w.data || {};
+    return {
+      id,
+      name: meta.name || id,
+      players: w.players.size,
+      playerList: [...w.players.values()].map(p => ({ id: p.id, name: p.name })),
+    };
+  });
+  res.json({
+    port: PORT,
+    uptime: Math.floor((Date.now() - _startTime) / 1000),
+    totalPlayers: worldList.reduce((n, w) => n + w.players, 0),
+    worlds: worldList,
+  });
+});
+
 // WebSocket: multiplayer state sync
 const worlds = {}; // worldId -> { players: Map<ws, player>, runner: LuaWorldRunner }
 

@@ -4,6 +4,9 @@
   "description": "LuaGen - Decentralized 3D WebWorlds. Host your own. Visit any URL.",
   "main": "server/index.js",
   "type": "commonjs",
+  "bin": {
+    "luagen": "./bin/luagen.js"
+  },
   "scripts": {
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
