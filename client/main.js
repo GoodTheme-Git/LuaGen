@@ -20,8 +20,9 @@ const sensSlider  = document.getElementById('sensitivity');
 const sensVal     = document.getElementById('sens-val');
 const fovSlider   = document.getElementById('fov-slider');
 const fovVal      = document.getElementById('fov-val');
-const btnMenuTouch = document.getElementById('btn-menu-touch');
-const btnChatTouch = document.getElementById('btn-chat-touch');
+const btnMenuTouch    = document.getElementById('btn-menu-touch');
+const btnChatTouch    = document.getElementById('btn-chat-touch');
+const btnEnterPortal  = document.getElementById('btn-enter-portal');
 
 let engine, input, net;
 let myPlayerId = null;
@@ -93,6 +94,15 @@ chatInput.addEventListener('keydown', e => {
   }
 });
 
+btnEnterPortal.addEventListener('click', () => {
+  const p = btnEnterPortal._portal;
+  if (!p || transitioning) return;
+  transitioning = true;
+  btnEnterPortal.classList.remove('visible');
+  const dest = p.target || p.targetWorld;
+  if (dest) enterPortal(dest);
+});
+
 btnChatTouch?.addEventListener('click', () => {
   if (chatOpen) return;
   chatOpen = true;
@@ -136,7 +146,9 @@ async function init(worldId) {
   loadScreen.textContent = 'Building world...';
 
   if (engine) { engine.generator?.dispose(); }
+  if (input) input.dispose();
   if (net) net.ws?.close();
+  btnEnterPortal.classList.remove('visible');
 
   engine = new WorldEngine(canvas);
   engine.loadWorld(worldData);
@@ -212,9 +224,20 @@ async function init(worldId) {
     }
 
     if (portal && !transitioning) {
-      transitioning = true;
-      const dest = portal.target || portal.targetWorld;
-      if (dest) enterPortal(dest);
+      // Show tap button on touch; auto-trigger on desktop
+      if (input.isTouch) {
+        btnEnterPortal.textContent = '→ ' + (portal.label || portal.targetWorld || 'Portal');
+        btnEnterPortal.style.color = portal._inner?.color?.getStyle?.() || '#00ffcc';
+        btnEnterPortal.classList.add('visible');
+        btnEnterPortal._portal = portal;
+      } else {
+        transitioning = true;
+        const dest = portal.target || portal.targetWorld;
+        if (dest) enterPortal(dest);
+      }
+    } else if (!portal) {
+      btnEnterPortal.classList.remove('visible');
+      btnEnterPortal._portal = null;
     }
   }
   requestAnimationFrame(frame);

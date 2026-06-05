@@ -132,6 +132,14 @@ export class InputManager {
     btnSprint.addEventListener('touchcancel', e => { e.preventDefault(); this._touchSprint = false; }, { passive: false });
   }
 
+  dispose() {
+    // Remove touch listeners so re-entering a world doesn't stack them
+    const jZone = document.getElementById('joystick-zone');
+    const lZone = document.getElementById('look-zone');
+    if (jZone) { jZone.replaceWith(jZone.cloneNode(true)); }
+    if (lZone) { lZone.replaceWith(lZone.cloneNode(true)); }
+  }
+
   get() {
     // Keyboard
     const kb = {

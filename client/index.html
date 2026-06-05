@@ -293,6 +293,28 @@
       pointer-events: all;
     }
 
+    /* Portal proximity button */
+    #btn-enter-portal {
+      display: none;
+      position: absolute;
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 14px 28px;
+      border-radius: 30px;
+      background: rgba(0,0,0,0.7);
+      border: 2px solid currentColor;
+      color: #00ffcc;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      pointer-events: all;
+      backdrop-filter: blur(8px);
+      white-space: nowrap;
+      z-index: 15;
+    }
+    #btn-enter-portal.visible { display: block; }
+
     /* Left joystick touch zone — invisible but captures touches */
     #joystick-zone {
       position: absolute;
@@ -372,6 +394,8 @@
     <button class="touch-btn" id="btn-chat-touch">&#x1F4AC;</button>
     <button class="touch-btn" id="btn-menu-touch">&#x2630;</button>
   </div>
+
+  <button id="btn-enter-portal"></button>
 
   <script type="module" src="/main.js"></script>
 </body>

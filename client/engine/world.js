@@ -178,8 +178,8 @@ export class WorldEngine {
       const labelText = obj.label || (obj.targetWorld ? '→ ' + obj.targetWorld : '→ Portal');
       this._addLabel(labelText, new THREE.Vector3(px, py + h + 0.4, pz));
 
-      // Trigger zone — slightly in front of portal face
-      const depth = 1.5;
+      // Trigger zone — wide enough to catch touch joystick movement
+      const depth = 3.5;
       this.portals.push({
         zone: {
           min: new THREE.Vector3(px - w / 2, py, pz - depth),
