@@ -99,25 +99,6 @@ chatInput.addEventListener('keydown', e => {
   }
 });
 
-// Use touchend (not click) — look-zone's preventDefault swallows click on mobile
-btnEnterPortal.addEventListener('touchend', (e) => {
-  e.preventDefault();
-  const p = btnEnterPortal._portal;
-  if (!p || transitioning) return;
-  transitioning = true;
-  btnEnterPortal.classList.remove('visible');
-  const dest = p.target || p.targetWorld;
-  if (dest) enterPortal(dest);
-});
-// Desktop fallback
-btnEnterPortal.addEventListener('click', () => {
-  const p = btnEnterPortal._portal;
-  if (!p || transitioning) return;
-  transitioning = true;
-  btnEnterPortal.classList.remove('visible');
-  const dest = p.target || p.targetWorld;
-  if (dest) enterPortal(dest);
-});
 
 btnChatTouch?.addEventListener('click', () => {
   if (chatOpen) return;
@@ -279,24 +260,15 @@ async function init(worldId) {
     }
 
     if (portal && !transitioning) {
-      if (input.isTouch) {
-        btnEnterPortal.textContent = '→ ' + (portal.targetWorld || portal.target || 'Portal');
-        btnEnterPortal.classList.add('visible');
-        btnEnterPortal._portal = portal;
-        btnEnterPortal._hideAt = null; // reset any pending hide
-      } else {
-        transitioning = true;
-        const dest = portal.target || portal.targetWorld;
-        if (dest) enterPortal(dest);
-      }
-    } else if (!portal && btnEnterPortal._portal && !transitioning) {
-      // Grace period — player may drift out of zone while reaching for the button
-      if (!btnEnterPortal._hideAt) btnEnterPortal._hideAt = now + 2000;
-      if (now > btnEnterPortal._hideAt) {
-        btnEnterPortal.classList.remove('visible');
-        btnEnterPortal._portal = null;
-        btnEnterPortal._hideAt = null;
-      }
+      // Show approach indicator
+      btnEnterPortal.textContent = '→ ' + (portal.targetWorld || portal.target || 'Portal');
+      btnEnterPortal.classList.add('visible');
+      // Auto-trigger for everyone — proximity breached
+      transitioning = true;
+      const dest = portal.target || portal.targetWorld;
+      if (dest) enterPortal(dest);
+    } else if (!portal) {
+      btnEnterPortal.classList.remove('visible');
     }
   }
   requestAnimationFrame(frame);

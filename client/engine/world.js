@@ -178,15 +178,14 @@ export class WorldEngine {
       const labelText = obj.label || (obj.targetWorld ? '→ ' + obj.targetWorld : '→ Portal');
       this._addLabel(labelText, new THREE.Vector3(px, py + h + 0.4, pz));
 
-      // Trigger zone — wide enough to catch touch joystick movement
-      const depth = 3.5;
+      // Proximity radius — trigger when player centre is within this distance
+      const radius = (w / 2) + 2.0;
       this.portals.push({
-        zone: {
-          min: new THREE.Vector3(px - w / 2, py, pz - depth),
-          max: new THREE.Vector3(px + w / 2, py + h, pz + depth),
-        },
+        pos: new THREE.Vector3(px, py + h / 2, pz),
+        radius,
         target: obj.target || null,
         targetWorld: obj.targetWorld || null,
+        label: obj.label || null,
         id: obj.id,
         _inner: innerMat,
         _light: pl,
@@ -272,12 +271,9 @@ export class WorldEngine {
   _checkPortals() {
     const pos = this.playerPos;
     for (const p of this.portals) {
-      const { min, max } = p.zone;
-      if (pos.x > min.x && pos.x < max.x &&
-          pos.y > min.y && pos.y < max.y + this.playerHeight &&
-          pos.z > min.z && pos.z < max.z) {
-        return p;
-      }
+      const dx = pos.x - p.pos.x;
+      const dz = pos.z - p.pos.z;
+      if (Math.sqrt(dx * dx + dz * dz) < p.radius) return p;
     }
     return null;
   }
