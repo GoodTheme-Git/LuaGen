@@ -84,7 +84,7 @@
     #crosshair::after  { height: 2px; width: 100%; top: 50%;  transform: translateY(-50%); }
     .touch-active #crosshair { display: none; }
 
-    /* Chat */
+    /* Chat — desktop */
     #chat-area {
       position: absolute;
       bottom: 16px; left: 16px;
@@ -117,6 +117,61 @@
       backdrop-filter: blur(8px);
     }
     #chat-input:focus { border-color: #e94560; }
+
+    /* Chat — mobile overlay (sits above keyboard using visualViewport) */
+    #mobile-chat-overlay {
+      display: none;
+      position: fixed;
+      left: 0; right: 0;
+      bottom: 0;
+      background: rgba(10,10,20,0.97);
+      border-top: 1px solid rgba(233,69,96,0.3);
+      z-index: 60;
+      flex-direction: column;
+      pointer-events: all;
+    }
+    #mobile-chat-overlay.open { display: flex; }
+
+    #mobile-chat-log {
+      flex: 1;
+      max-height: 180px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 12px 12px 8px;
+      scrollbar-width: none;
+    }
+
+    #mobile-chat-row {
+      display: flex;
+      gap: 8px;
+      padding: 8px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    #mobile-chat-input {
+      flex: 1;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(233,69,96,0.4);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+    }
+    #mobile-chat-input:focus { border-color: #e94560; }
+
+    #mobile-chat-send {
+      padding: 10px 18px;
+      background: #e94560;
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
 
     #controls-hint {
       position: absolute;
@@ -396,6 +451,15 @@
   </div>
 
   <button id="btn-enter-portal"></button>
+
+  <!-- Mobile chat overlay -->
+  <div id="mobile-chat-overlay">
+    <div id="mobile-chat-log"></div>
+    <div id="mobile-chat-row">
+      <input id="mobile-chat-input" type="text" placeholder="Say something…" maxlength="256" autocomplete="off">
+      <button id="mobile-chat-send">Send</button>
+    </div>
+  </div>
 
   <script type="module" src="/main.js"></script>
 </body>

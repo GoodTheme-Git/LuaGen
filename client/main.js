@@ -20,9 +20,14 @@ const sensSlider  = document.getElementById('sensitivity');
 const sensVal     = document.getElementById('sens-val');
 const fovSlider   = document.getElementById('fov-slider');
 const fovVal      = document.getElementById('fov-val');
-const btnMenuTouch    = document.getElementById('btn-menu-touch');
-const btnChatTouch    = document.getElementById('btn-chat-touch');
-const btnEnterPortal  = document.getElementById('btn-enter-portal');
+const btnMenuTouch      = document.getElementById('btn-menu-touch');
+const btnChatTouch      = document.getElementById('btn-chat-touch');
+const btnEnterPortal    = document.getElementById('btn-enter-portal');
+const mobileChatOverlay = document.getElementById('mobile-chat-overlay');
+const mobileChatLog     = document.getElementById('mobile-chat-log');
+const mobileChatInput   = document.getElementById('mobile-chat-input');
+const mobileChatSend    = document.getElementById('mobile-chat-send');
+const touchUI           = document.getElementById('touch-ui');
 
 let engine, input, net;
 let myPlayerId = null;
@@ -105,9 +110,48 @@ btnEnterPortal.addEventListener('click', () => {
 
 btnChatTouch?.addEventListener('click', () => {
   if (chatOpen) return;
+  openMobileChat();
+});
+
+// ── Mobile chat ───────────────────────────────────────────────
+function openMobileChat() {
   chatOpen = true;
-  chatInput.style.display = 'block';
-  chatInput.focus();
+  mobileChatOverlay.classList.add('open');
+  touchUI.style.pointerEvents = 'none'; // freeze joystick while typing
+  mobileChatInput.focus();
+
+  // Keep overlay above the software keyboard using visualViewport
+  function reposition() {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const bottom = window.innerHeight - vv.height - vv.offsetTop;
+    mobileChatOverlay.style.transform = `translateY(-${bottom}px)`;
+  }
+  reposition();
+  window.visualViewport?.addEventListener('resize', reposition);
+  mobileChatOverlay._reposition = reposition;
+}
+
+function closeMobileChat() {
+  chatOpen = false;
+  mobileChatOverlay.classList.remove('open');
+  mobileChatOverlay.style.transform = '';
+  touchUI.style.pointerEvents = '';
+  window.visualViewport?.removeEventListener('resize', mobileChatOverlay._reposition);
+  mobileChatInput.value = '';
+}
+
+function sendMobileChat() {
+  const text = mobileChatInput.value.trim();
+  if (text) net?.sendChat(text);
+  mobileChatInput.value = '';
+  closeMobileChat();
+}
+
+mobileChatSend.addEventListener('click', sendMobileChat);
+mobileChatInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') { sendMobileChat(); e.preventDefault(); }
+  if (e.key === 'Escape') { closeMobileChat(); e.preventDefault(); }
 });
 
 function closeChat() {
@@ -261,12 +305,14 @@ window.addEventListener('popstate', () => {
 });
 
 function addChat(text) {
-  const line = document.createElement('div');
-  line.className = 'chat-line';
-  line.textContent = text;
-  chatLog.appendChild(line);
-  chatLog.scrollTop = chatLog.scrollHeight;
-  if (chatLog.children.length > 50) chatLog.removeChild(chatLog.firstChild);
+  for (const log of [chatLog, mobileChatLog]) {
+    const line = document.createElement('div');
+    line.className = 'chat-line';
+    line.textContent = text;
+    log.appendChild(line);
+    log.scrollTop = log.scrollHeight;
+    if (log.children.length > 50) log.removeChild(log.firstChild);
+  }
 }
 
 let pcount = 0;
