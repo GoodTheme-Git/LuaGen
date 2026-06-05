@@ -85,6 +85,14 @@ class LuaWorldRunner {
       return 0;
     });
 
+    this._setFunc('setPanelText', (L) => {
+      const id    = lua.lua_tojsstring(L, 1);
+      const index = lua.lua_tonumber(L, 2) - 1; // Lua is 1-indexed
+      const text  = lua.lua_tojsstring(L, 3) || '';
+      self.broadcast({ type: 'event', name: 'setPanelText', data: { id, index, text } });
+      return 0;
+    });
+
     lua.lua_setglobal(L, to_luastring('World'));
 
     // Player table

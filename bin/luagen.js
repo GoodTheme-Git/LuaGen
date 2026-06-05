@@ -57,6 +57,7 @@ const commands = {
     const row = (cmd, desc) => console.log(`  ${c.cyan(cmd.padEnd(28))} ${c.dim(desc)}`);
     console.log(c.bold('Usage:') + '  luagen <command> [options]\n');
     row('all',                 'Show everything: status, worlds, players');
+    row('builder [world]',     'Open the world builder in the browser');
     row('start',               'Start the server (foreground)');
     row('start --daemon',      'Start the server in the background');
     row('stop',                'Stop the background server');
@@ -269,6 +270,15 @@ const commands = {
       console.log(`  ${c.dim('luagen start  to bring the server up')}`);
       console.log();
     }
+  },
+
+  builder() {
+    const world = process.argv[3] || 'demo';
+    const url = `http://localhost:${PORT}/builder?world=${world}`;
+    console.log(`${c.green('→')} Opening builder: ${c.cyan(url)}`);
+    const open = process.platform === 'darwin' ? 'open' : 'xdg-open';
+    const { spawn } = require('child_process');
+    spawn(open, [url], { stdio: 'ignore', detached: true }).unref();
   },
 
   convert() {

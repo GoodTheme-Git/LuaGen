@@ -6,6 +6,7 @@ const fs = require('fs');
 const { LuaWorldRunner } = require('./lua-runner');
 
 const app = express();
+app.use(express.json({ limit: '10mb' }));
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
@@ -16,6 +17,22 @@ const WORLDS_DIR = path.join(__dirname, '..', 'worlds');
 app.use(express.static(path.join(__dirname, '..', 'client')));
 app.use('/sdk', express.static(path.join(__dirname, '..', 'sdk')));
 app.use('/node_modules', express.static(path.join(__dirname, '..', 'node_modules')));
+
+// Builder
+app.get('/builder', (req, res) =>
+  res.sendFile(path.join(__dirname, '..', 'client', 'builder', 'index.html')));
+
+// Save world from builder
+app.post('/api/world/:id/save', (req, res) => {
+  const id = req.params.id.replace(/[^a-z0-9_-]/gi, '');
+  const dir = path.join(WORLDS_DIR, id);
+  if (!fs.existsSync(dir)) return res.status(404).json({ error: 'World not found' });
+  const data = req.body;
+  if (!data || !data.objects) return res.status(400).json({ error: 'Invalid world data' });
+  fs.writeFileSync(path.join(dir, 'world.json'), JSON.stringify(data, null, 2));
+  delete worlds[id]; // clear cache so next visit reloads
+  res.json({ ok: true });
+});
 
 // World manifest API
 app.get('/api/worlds', (req, res) => {

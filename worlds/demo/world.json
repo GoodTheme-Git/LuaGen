@@ -107,6 +107,20 @@
       "label": "WebWorld - Visit any URL, live in 3D"
     },
     {
+      "id": "info_panel",
+      "type": "panel",
+      "pos": [0, 1.25, -4],
+      "size": [7, 2.2],
+      "background": "#0d0d2b",
+      "border": "#e94560",
+      "borderWidth": 3,
+      "items": [
+        { "type": "text", "content": "LuaGen WebWorld", "color": "#e94560", "fontSize": 32, "x": 0.5, "y": 0.3, "align": "center", "bold": true },
+        { "type": "text", "content": "WASD move  ·  Space jump  ·  T chat  ·  Q pause", "color": "#888888", "fontSize": 18, "x": 0.5, "y": 0.62, "align": "center" },
+        { "type": "text", "content": "Walk toward the cyan arch to travel to the Hub →", "color": "#555577", "fontSize": 15, "x": 0.5, "y": 0.84, "align": "center" }
+      ]
+    },
+    {
       "id": "portal_to_hub",
       "type": "portal",
       "pos": [0, 1.0, 21],

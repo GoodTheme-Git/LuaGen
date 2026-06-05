@@ -228,10 +228,11 @@ async function init(worldId) {
     chat:   (msg) => { addChat(`${msg.name}: ${msg.text}`); },
     rename: () => {},
     event:  (msg) => {
-      if (msg.name === 'setPos')   engine.setObjectPos(msg.data.id, msg.data.x, msg.data.y, msg.data.z);
-      if (msg.name === 'setRot')   engine.setObjectRotation(msg.data.id, msg.data.x, msg.data.y, msg.data.z);
-      if (msg.name === 'setColor') engine.setObjectColor(msg.data.id, msg.data.hex);
-      if (msg.name === 'impulse')  engine.impulse(msg.data.x, msg.data.y, msg.data.z);
+      if (msg.name === 'setPos')       engine.setObjectPos(msg.data.id, msg.data.x, msg.data.y, msg.data.z);
+      if (msg.name === 'setRot')       engine.setObjectRotation(msg.data.id, msg.data.x, msg.data.y, msg.data.z);
+      if (msg.name === 'setColor')     engine.setObjectColor(msg.data.id, msg.data.hex);
+      if (msg.name === 'impulse')      engine.impulse(msg.data.x, msg.data.y, msg.data.z);
+      if (msg.name === 'setPanelText') engine.setPanelText(msg.data.id, msg.data.index, msg.data.text);
     },
     error: (msg) => { loadScreen.style.display = 'flex'; loadScreen.textContent = 'Error: ' + msg.message; },
   });

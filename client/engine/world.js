@@ -1,9 +1,11 @@
 import * as THREE from '/node_modules/three/build/three.module.js';
+import { WorldUIPanel } from './worldui.js';
 
 export class WorldEngine {
   constructor(canvas) {
     this.canvas = canvas;
     this.objects = new Map(); // id -> mesh
+    this.panels  = new Map(); // id -> WorldUIPanel
     this.collidables = [];
     this.labels = [];
     this._initRenderer();
@@ -49,6 +51,8 @@ export class WorldEngine {
   loadWorld(data) {
     this.scene.clear();
     this.objects.clear();
+    this.panels.forEach(p => p.dispose());
+    this.panels.clear();
     this.collidables = [];
     this.labels = [];
     this.portals = []; // { zone: {min,max}, target, label }
@@ -200,10 +204,25 @@ export class WorldEngine {
       mesh.castShadow = true;
     }
 
+    if (obj.type === 'panel') {
+      const panel = new WorldUIPanel(obj);
+      this.scene.add(panel.mesh);
+      if (obj.id) {
+        this.panels.set(obj.id, panel);
+        this.objects.set(obj.id, panel.mesh);
+      }
+      return;
+    }
+
     if (mesh) {
       this.scene.add(mesh);
       if (obj.id) this.objects.set(obj.id, mesh);
     }
+  }
+
+  // Update a panel's text item from a Lua event
+  setPanelText(panelId, itemIndex, text) {
+    this.panels.get(panelId)?.setText(itemIndex, text);
   }
 
   _addLabel(text, pos) {
