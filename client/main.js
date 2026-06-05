@@ -276,13 +276,12 @@ async function init(worldId) {
 
 async function enterPortal(dest) {
   document.exitPointerLock();
-  addChat(`[Portal] Travelling to ${dest}...`);
   await fadeOut();
-  if (!dest.startsWith('http')) {
-    history.pushState({}, '', `?world=${dest}`);
-    await init(dest);
-  } else {
+  // Simple navigation — works everywhere including mobile
+  if (dest.startsWith('http')) {
     location.href = dest;
+  } else {
+    location.href = `?world=${dest}`;
   }
 }
 
